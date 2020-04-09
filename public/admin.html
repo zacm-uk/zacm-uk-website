@@ -1,10 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Zac McChesney | Admin</title>
 
   <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap" rel="stylesheet">
+  <script src="https://cdn.tiny.cloud/1/emt9rdgoef5ir8olndwqeolehmhz88hm5e3ngzmouefq9mjj/tinymce/5/tinymce.min.js"
+          referrerpolicy="origin"></script>
   <style>
     body {
       font-family: 'Roboto Mono', monospace;
@@ -13,8 +16,15 @@
 </head>
 <body>
 <script>
-  const username = prompt('Username:')
-  const password = prompt('Password:')
+  let username
+  let password
+  if (sessionStorage.getItem('login')) {
+    [ username, password ] = sessionStorage.getItem('login').split(':')
+  } else {
+    username = prompt('Username:')
+    password = prompt('Password:')
+  }
+  sessionStorage.setItem('login', `${ username }:${ password }`)
 </script>
 <h1>Zac McChesney Admin</h1>
 <ul id="posts"></ul>
@@ -53,11 +63,31 @@
 
   const createPostEditor = post => {
     const holder = document.createElement('div')
+    const randomId = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15)
     holder.innerHTML = `<button id="remove" style="display: ${ post ? 'block' : 'none' }">Remove</button>
                         Title: <div contenteditable="true" id="title" style="min-width: 50px; min-height: 10px">${ post ? post.title : '' }</div>
                         Author: <div contenteditable="true" id="author" style="min-width: 50px; min-height: 10px">${ post ? post.author : '' }</div>
-                        Content: <div contenteditable="true" id="post-content" style="min-width: 50px; min-height: 10px">${ post ? post.content : '' }</div>
+                        Content: <textarea id="${ randomId }">${ post ? post.content : '' }</textarea>
                         <button id="submit">Save</button>`
+
+    const observer = new MutationObserver(() => {
+      if (document.getElementById(randomId)) {
+        tinymce.init({
+          selector: `#${ randomId }`,
+          plugins: 'print preview paste importcss searchreplace autolink autosave save directionality code visualblocks visualchars fullscreen link media template codesample table charmap hr pagebreak nonbreaking anchor toc insertdatetime advlist lists wordcount textpattern noneditable help charmap quickbars emoticons',
+          menubar: 'file edit view insert format tools table help',
+          toolbar: 'undo redo | bold italic underline strikethrough | fontselect fontsizeselect formatselect | alignleft aligncenter alignright alignjustify | outdent indent |  numlist bullist | forecolor backcolor removeformat | pagebreak | charmap emoticons | fullscreen  preview save print | insertfile media template link anchor codesample | ltr rtl',
+          toolbar_sticky: true,
+          quickbars_selection_toolbar: 'bold italic | quicklink h2 h3 blockquote quicktable',
+          noneditable_noneditable_class: 'mceNonEditable',
+          toolbar_mode: 'sliding',
+          contextmenu: 'link table'
+        })
+        observer.disconnect()
+      }
+    })
+    observer.observe(document.body, { childList: true, subtree: true })
+
     holder.querySelector('#remove').addEventListener('click', () => {
       removePost(post.title)
     })
@@ -65,7 +95,7 @@
       (post ? updatePost : addPost)({
         title: holder.querySelector('#title').innerHTML,
         author: holder.querySelector('#author').innerHTML,
-        content: holder.querySelector('#post-content').innerHTML
+        content: tinyMCE.activeEditor.getContent()
       })
     })
 
