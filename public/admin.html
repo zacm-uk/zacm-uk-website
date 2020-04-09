@@ -54,9 +54,9 @@
   const createPostEditor = post => {
     const holder = document.createElement('div')
     holder.innerHTML = `<button id="remove" style="display: ${ post ? 'block' : 'none' }">Remove</button>
-                        Title: <div contenteditable="true" id="title" style="min-width: 50px">${ post ? post.title : '' }</div>
-                        Author: <div contenteditable="true" id="author" style="min-width: 50px">${ post ? post.author : '' }</div>
-                        Content: <div contenteditable="true" id="post-content" style="min-width: 50px">${ post ? post.content : '' }</div>
+                        Title: <div contenteditable="true" id="title" style="min-width: 50px; min-height: 10px">${ post ? post.title : '' }</div>
+                        Author: <div contenteditable="true" id="author" style="min-width: 50px; min-height: 10px">${ post ? post.author : '' }</div>
+                        Content: <div contenteditable="true" id="post-content" style="min-width: 50px; min-height: 10px">${ post ? post.content : '' }</div>
                         <button id="submit">Save</button>`
     holder.querySelector('#remove').addEventListener('click', () => {
       removePost(post.title)
