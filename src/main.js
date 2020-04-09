@@ -8,6 +8,18 @@ const mount = st({ path: join(__dirname, '../public'), index: 'index.html' })
 
 const { addPost, getPost, removePost, updatePost, getAllPosts } = require('./logic')
 
+const base64Auth = (request, response) => {
+  const [ , header ] = (request.headers.authorization || '').split('Basic ')
+  const [ username, password ] = Buffer.from(header, 'base64').toString().split(':')
+  if (username === process.env.ADMIN_USERNAME && password === process.env.ADMIN_PASSWORD) {
+    return true
+  }
+  response.statusCode = 401
+  response.setHeader('content-type', 'application/json')
+  response.write(JSON.stringify({ message: 'Unauthorised' }))
+  response.end()
+}
+
 const routes = {
   'GET /posts': async ({ response }) => {
     response.setHeader('content-type', 'application/json')
@@ -25,21 +37,30 @@ const routes = {
     response.end()
   },
 
-  'POST /post': async ({ response, body }) => {
+  'POST /post': async ({ request, response, body }) => {
+    if (!base64Auth(request, response)) {
+      return
+    }
     const { title, content, author } = body
     await addPost({ title, content, author })
     response.statusCode = 204
     response.end()
   },
 
-  'PUT /post': async ({ response, body }) => {
+  'PUT /post': async ({ request, response, body }) => {
+    if (!base64Auth(request, response)) {
+      return
+    }
     const { title, content, author } = body
     await updatePost({ title, content, author })
     response.statusCode = 204
     response.end()
   },
 
-  'DELETE /post': async ({ response, params }) => {
+  'DELETE /post': async ({ request, response, params }) => {
+    if (!base64Auth(request, response)) {
+      return
+    }
     const title = params.get('title')
     if (!title) {
       throw new Error('No title')
