@@ -1,6 +1,7 @@
 const { randomBytes, createCipheriv, createDecipheriv } = require('crypto')
 
-process.env.EMPIRE_CONFIG = 'type=CLIENT storageDriver=memory nodeList=https://empire.zacm.uk'
+process.env.EMPIRE_CONFIG = 'type=CLIENT storageDriver=sql nodeList=https://empire.zacm.uk'
+process.env.STORAGE_DIALECT = 'sqlite'
 
 const { node } = require('z-empire')
 
