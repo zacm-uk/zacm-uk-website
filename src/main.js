@@ -82,4 +82,4 @@ createServer((request, response) => {
         response.end()
       })
   })
-}).listen(process.env.PORT || 3001)
+}).listen(process.env.PORT || 3001, () => console.log(`Listening on ${ process.env.PORT || 3001 }`))
