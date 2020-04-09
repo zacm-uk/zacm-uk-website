@@ -80,6 +80,9 @@ createServer((request, response) => {
     if (path === '/') {
       request.url = request.url.replace('/', '/index.html')
     }
+    if (path === '/admin') {
+      request.url = request.url.replace('/admin', '/admin.html')
+    }
     mount(request, response)
     return
   }
