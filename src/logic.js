@@ -2,7 +2,7 @@ const { randomBytes, createCipheriv, createDecipheriv } = require('crypto')
 
 process.env.EMPIRE_CONFIG = 'type=CLIENT storageDriver=memory nodeList=https://empire.zacm.uk hidden=true'
 
-const { node } = require('@zacm-uk/z-empire')
+const { node } = require('z-empire')
 
 const encrypt = (data, key) => {
   key = key || randomBytes(32)
