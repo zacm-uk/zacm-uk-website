@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Zac McChesney</title>
+</head>
+<body>
+<h1>Zac McChesney</h1>
+<ul id="posts"></ul>
+<div id="content"></div>
+
+<script>
+  const getPosts = () => fetch('/posts')
+    .then(req => req.json())
+
+  const addPost = ({ title, content, author }) => fetch('/post', {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json'
+    },
+    body: JSON.stringify({ title, content, author })
+  }).then(req => req.json()).then(console.log)
+
+  const updatePost = ({ title, content, author }) => fetch('/post', {
+    method: 'PUT',
+    headers: {
+      'content-type': 'application/json'
+    },
+    body: JSON.stringify({ title, content, author })
+  }).then(req => req.json()).then(console.log)
+
+  const removePost = title => fetch(`/post?title=${ title }`, {
+    method: 'DELETE'
+  }).then(req => req.json()).then(console.log)
+
+  const drawPosts = posts => {
+    const postsList = document.getElementById('posts')
+    const content = document.getElementById('content')
+
+    for (const child of postsList.children) {
+      child.remove()
+    }
+
+    for (const post of posts) {
+      const li = document.createElement('li')
+      li.innerHTML = `<a href="#">${ post.title }</a>`
+      li.firstElementChild.addEventListener('click', () => {
+        for (const child of content.children) {
+          child.remove()
+        }
+        const holder = document.createElement('div')
+        holder.innerHTML = `<h1>${ post.title }</h1>
+                            <h2>${ post.author }</h2>
+                            <div>${ post.content }</div>`
+        content.appendChild(holder)
+      })
+      postsList.appendChild(li)
+    }
+  }
+
+  getPosts().then(drawPosts)
+</script>
+</body>
+</html>
